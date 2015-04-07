@@ -1,7 +1,8 @@
-﻿# gentoo FLOSS (Free/Libre and Open Source Software) overlay.
+﻿# gentoo FLOSS overlay
+(Free/Libre and Open Source Software)
 
 ## Description
-	This overlay includes only those programs that are "free" ("libre") and "open source" at the same time.
+This overlay includes only those programs that are "free" ("libre") and "open source" at the same time.
 
 ## Installation
 
@@ -12,9 +13,9 @@
     echo 'source /var/lib/layman/make.conf' >> /etc/make.conf
 
 #### Add the 'FLOSS' overlay
-    layman -o https://github.com/linux0uid/gentoo-overlay/master/overlay.xml -f -a FLOSS
+    layman -o https://github.com/linux0uid/gentoo-overlay/raw/master/overlay.xml -f -a FLOSS
 
-#### Sync overlays=
+#### Sync overlays
     layman -S
 
 #### Install:
