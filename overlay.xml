@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <layman>
   <overlay
-    name="linux0uid"
+    name="FLOSS"
     contact="linux0uid@gmail.com"
     quality="experimental"
     status="unofficial"
     type="git"
     src="git://github.com/linux0uid/gentoo-overlay.git">
     <link>//github.com/linux0uid/gentoo-overlay</link>
-    <description> linux0uid gentoo overlay </description>
+    <description> FLOSS (Free/Libre and Open Source Software) overlay </description>
   </overlay>
 </layman>
