@@ -12,7 +12,7 @@ SRC_URI=""
 
 EGIT_REPO_URI="	git://github.com/escapestudios/Symfony2-coding-standard.git
 				https://github.com/escapestudios/Symfony2-coding-standard.git"
-EGIT_COMMIT="2.0.1"
+EGIT_COMMIT="452a9c7ca51270b927cd1fcbeddaadb59b1fa6c9"
 
 LICENSE="MIT"
 SLOT="0"
