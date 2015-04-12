@@ -4,15 +4,11 @@
 
 EAPI="5"
 
-inherit git-r3
+UpPN="Symfony2-coding-standard"
 
 DESCRIPTION="Symfony2 PHP CodeSniffer Coding Standard"
 HOMEPAGE="https://github.com/escapestudios/Symfony2-coding-standard"
-SRC_URI=""
-
-EGIT_REPO_URI="	git://github.com/escapestudios/Symfony2-coding-standard.git
-				https://github.com/escapestudios/Symfony2-coding-standard.git"
-EGIT_COMMIT="452a9c7ca51270b927cd1fcbeddaadb59b1fa6c9"
+SRC_URI="https://github.com/escapestudios/${UpPN}/archive/${PV}.tar.gz -> ${PF}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
@@ -21,19 +17,15 @@ IUSE=""
 
 RDEPEND=">=dev-php/PEAR-PHP_CodeSniffer-2.3.0"
 DEPEND="${RDEPEND}
-		>=dev-vcs/git-2.0.5
-		>=dev-php/pear-1.9.4"
+        >=dev-php/pear-1.9.4"
 
-src_unpack() {
-	git-r3_fetch
-	git-r3_checkout
-}
+S="${WORKDIR}/${UpPN}-${PV}"
 
 src_install() {
-	php_dir=$(pear config-get php_dir)
-	dodir "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
-	insinto "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
-	doins -r "${S}/Sniffs"
-	doins -r "${S}/Tests"
-	doins "${S}/ruleset.xml"
+    php_dir=$(pear config-get php_dir)
+    dodir "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
+    insinto "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
+    doins -r "${S}/Sniffs"
+    doins -r "${S}/Tests"
+    doins "${S}/ruleset.xml"
 }
