@@ -17,15 +17,15 @@ IUSE=""
 
 RDEPEND=">=dev-php/PEAR-PHP_CodeSniffer-2.3.0"
 DEPEND="${RDEPEND}
-        >=dev-php/pear-1.9.4"
+		>=dev-php/pear-1.9.4"
 
 S="${WORKDIR}/${UpPN}-${PV}"
 
 src_install() {
-    php_dir=$(pear config-get php_dir)
-    dodir "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
-    insinto "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
-    doins -r "${S}/Sniffs"
-    doins -r "${S}/Tests"
-    doins "${S}/ruleset.xml"
+	php_dir=$(pear config-get php_dir)
+	dodir "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
+	insinto "${php_dir}/PHP/CodeSniffer/Standards/Symfony2"
+	doins -r "${S}/Sniffs"
+	doins -r "${S}/Tests"
+	doins "${S}/ruleset.xml"
 }
