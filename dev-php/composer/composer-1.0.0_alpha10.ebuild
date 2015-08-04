@@ -13,8 +13,8 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE=""
 
-DEPEND="dev-lang/php[phar]"
-RDEPEND="${DEPEND}"
+RDEPEND="dev-lang/php[phar]"
+DEPEND="${DEPEND}"
 
 src_unpack() {
 	# Satisfy portage.
@@ -22,9 +22,9 @@ src_unpack() {
 }
 
 src_prepare() {
-	cp "../../distdir/${P}.phar" composer
+	cp "../../distdir/${P}.phar" ${PN}
 }
 
 src_install() {
-	dobin composer
+	dobin ${PN}
 }
