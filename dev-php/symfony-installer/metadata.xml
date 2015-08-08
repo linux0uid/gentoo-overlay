@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer>
+		<email>linux0uid@gmail.com</email>
+		<name>Konstantin Slupko</name>
+	</maintainer>
+	<longdescription>
+		The official installer to start new projects based on the Symfony full-stack framework
+	</longdescription>
+</pkgmetadata>

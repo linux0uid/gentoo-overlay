@@ -22,7 +22,6 @@ IUSE=""
 
 RDEPEND="dev-lang/php[phar]"
 DEPEND="${DEPEND}
-		>=dev-vcs/git-2.4.6
 		>=dev-php/composer-1.0.0_alpha10"
 
 src_unpack() {
