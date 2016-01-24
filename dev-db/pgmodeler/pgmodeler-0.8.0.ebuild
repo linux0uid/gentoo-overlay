@@ -13,10 +13,18 @@ SRC_URI="https://github.com/${PN}/${PN}/archive/v${PV/_/-}.tar.gz"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
+
+LINGUAS="en fr_FR pt_BR zh_CN"
 IUSE="test"
 
+for lingua in ${LINGUAS}; do
+	if [[ ${lingua} != "en" ]] ; then
+		IUSE+=" linguas_${lingua}"
+	fi
+done
+
 RDEPEND="
-	dev-db/postgresql:=
+	=dev-db/postgresql-9.4*
 	dev-libs/libxml2
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5
@@ -32,24 +40,11 @@ DOCS=( CHANGELOG.md README.md )
 S="${WORKDIR}/${PN}-${PV/_/-}"
 
 src_prepare() {
-	# Don't build the plugins, their build system doesn't work with a
-	# non-default LIBDIR. See,
-	#
-	#   https://github.com/pgmodeler/pgmodeler/issues/479
-	#
-	#sed -i -e '/plugins\/dummy/d' -e '/plugins\/xml2object/d' pgmodeler.pro \
-	#	|| die 'failed to disable plugins'
 
 	sed -i -e 's/TARGET = pgmodeler/TARGET = pgmodeler-bin/' main/main.pro \
 		|| die 'failed to rename binary'
 
 	old_path="/opt/pgmodeler"
-
-	#sed -i -e 's|\(<TargetDir>\)\([^<]*\)\(<[^>]*\)|\1'"${S}"'\3|' installer/linux/config/config.xml \
-	#	|| die 'failed to change work directory in config.xml'
-
-	#sed -i "s|${old_path}|${S}|g" linuxdeploy.sh \
-	#	|| die 'failed to change work directory in linuxdeploy.sh'
 	sed -i "s|${old_path}|${S}|g" pgmodeler.pri \
 		|| die 'failed to change work directory in pgmodeler.pri'
 }
@@ -109,6 +104,15 @@ src_install() {
 	doins -r "${S}/conf"
 	doins -r "${S}/schemas"
 	doins -r "${S}/plugins"
+
+	# LINGUAS
+	insinto "/usr/share/${PN}/lang"
+	for lingua in ${LINGUAS}; do
+		if [[ ${lingua} != "en" ]] && use linguas_${lingua} ; then
+			doins "${S}/lang/${lingua}.qm"
+			doins "${S}/lang/${lingua}.ts"
+		fi
+	done
 }
 
 src_test() {
