@@ -3,9 +3,13 @@
 <pkgmetadata>
   <maintainer>
     <email>linux0uid@gmail.com</email>
-    <name>Konstantin Slupko</name>
   </maintainer>
   <longdescription>
 	Design, diagram, and deploy PostgreSQL databases
   </longdescription>
+  <use>
+    <flag name="plugins">
+      Enables the plugins building
+    </flag>
+  </use>
 </pkgmetadata>

@@ -15,10 +15,10 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 LINGUAS="en fr_FR pt_BR zh_CN"
-IUSE="test"
+IUSE="test +plugins"
 
 for lingua in ${LINGUAS}; do
-	if [[ ${lingua} != "en" ]] ; then
+	if [[ ${lingua} != "en" ]]; then
 		IUSE+=" linguas_${lingua}"
 	fi
 done
@@ -33,20 +33,25 @@ RDEPEND="
 	dev-qt/qtwidgets:5
 	"
 DEPEND="${RDEPEND}
-	virtual/pkgconfig"
-
+	virtual/pkgconfig
+	plugins? ( >=dev-qt/designer-5.4.2:5 )
+	"
 DOCS=( CHANGELOG.md README.md )
 
 S="${WORKDIR}/${PN}-${PV/_/-}"
 
 src_prepare() {
 
-	sed -i -e 's/TARGET = pgmodeler/TARGET = pgmodeler-bin/' main/main.pro \
-		|| die 'failed to rename binary'
-
 	old_path="/opt/pgmodeler"
 	sed -i "s|${old_path}|${S}|g" pgmodeler.pri \
 		|| die 'failed to change work directory in pgmodeler.pri'
+
+	# Enable the plugins building
+	if use plugins; then
+		sed -i '20a SUBDIRS += plugins' pgmodeler.pro \
+		&& sed -i 's/SUBDIRS\ +=\ tests\ plugins/SUBDIRS += tests/g' pgmodeler.pro \
+			|| die 'failed to change pgmodeler.pro'
+	fi
 }
 
 src_configure() {
@@ -71,8 +76,19 @@ src_install() {
 	default
 
 	# Install our shell script wrapper.
-	cat <<-EOF > "${T}/pgmodeler"
+	cat <<-EOF > "${S}/start-pgmodeler.sh"
 	#!/bin/bash
+
+	# Use this script if you having problems running pgModeler.
+	# The most common execution problem is the missing library error:
+	# [ ./pgmodeler: error while loading shared libraries: libutils.so.1: cannot open shared object file: No such file or directory ]
+
+	# This script configures all the needed enviroment variables but does not affects the configuration of the whole system.
+	# The only downside of this script is that you can not call the "pgmodeler" executable directly, being obligated
+	# to use this script every time you want to run the application.
+
+	# For a more elaborated solution you may find useful the usage of pgmodeler.vars file.
+	# Details about the use of that file are in it's comments.
 
 	export PGMODELER_ROOT="${ROOT}usr/share/pgmodeler"
 
@@ -91,24 +107,30 @@ src_install() {
 	export PGMODELER_LANG_DIR="\${PGMODELER_ROOT}/lang"
 	export PGMODELER_TMP_DIR="${ROOT}tmp"
 	export PGMODELER_PLUGINS_DIR="\${PGMODELER_ROOT}/plugins"
+	export PGMODELER_SAMPLES_DIR="\$PGMODELER_ROOT/samples"
 	export PGMODELER_CHANDLER_PATH="${ROOT}usr/bin/pgmodeler-ch"
+	export PGMODELER_CLI_PATH="${ROOT}usr/bin/pgmodeler-cli"
 	export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:"\${PGMODELER_ROOT}"
-	export PATH=\$PATH:\$PGMODELER_ROOT
 
-	pgmodeler-bin
+	"/usr/bin/${PN}" "\$@" &
 	EOF
 
-	dobin "${T}/pgmodeler"
+	dobin "${S}/start-pgmodeler.sh"
 
 	insinto "/usr/share/${PN}"
 	doins -r "${S}/conf"
 	doins -r "${S}/schemas"
-	doins -r "${S}/plugins"
+	doins -r "${S}/samples"
+
+	# Plugins
+	if use plugins; then
+		doins -r "${S}/plugins"
+	fi
 
 	# LINGUAS
 	insinto "/usr/share/${PN}/lang"
 	for lingua in ${LINGUAS}; do
-		if [[ ${lingua} != "en" ]] && use linguas_${lingua} ; then
+		if [[ ${lingua} != "en" ]] && use linguas_${lingua}; then
 			doins "${S}/lang/${lingua}.qm"
 			doins "${S}/lang/${lingua}.ts"
 		fi
