@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-  <maintainer>
-    <email>linux0uid@gmail.com</email>
-    <name>Konstantin Slupko</name>
-  </maintainer>
-  <longdescription>
-	A code standard to check against the Symfony coding standards.
-  </longdescription>
+	<maintainer>
+		<email>linux0uid@gmail.com</email>
+		<name>Konstantin Slupko</name>
+	</maintainer>
+	<longdescription>
+		A code standard to check against the Symfony coding standards.
+	</longdescription>
 </pkgmetadata>

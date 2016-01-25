@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-  <maintainer>
-    <email>linux0uid@gmail.com</email>
-  </maintainer>
-  <longdescription>
-	Design, diagram, and deploy PostgreSQL databases
-  </longdescription>
-  <use>
-    <flag name="plugins">
-      Enables the plugins building
-    </flag>
-  </use>
+	<maintainer>
+		<email>linux0uid@gmail.com</email>
+	</maintainer>
+	<longdescription>
+		Design, diagram, and deploy PostgreSQL databases
+	</longdescription>
+	<use>
+		<flag name="plugins">
+			Enables the plugins building
+		</flag>
+	</use>
 </pkgmetadata>
