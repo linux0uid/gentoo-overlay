@@ -46,6 +46,9 @@ src_prepare() {
 	sed -i "s|${old_path}|${S}|g" pgmodeler.pri \
 		|| die 'failed to change work directory in pgmodeler.pri'
 
+	sed -i -e 's/TARGET = pgmodeler/TARGET = pgmodeler-bin/' main/main.pro \
+			|| die 'failed to rename binary'
+
 	# Enable the plugins building
 	if use plugins; then
 		sed -i '20a SUBDIRS += plugins' pgmodeler.pro \
@@ -76,7 +79,7 @@ src_install() {
 	default
 
 	# Install our shell script wrapper.
-	cat <<-EOF > "${S}/start-pgmodeler.sh"
+	cat <<-EOF > "${S}/${PN}"
 	#!/bin/bash
 
 	# Use this script if you having problems running pgModeler.
@@ -112,10 +115,10 @@ src_install() {
 	export PGMODELER_CLI_PATH="${ROOT}usr/bin/pgmodeler-cli"
 	export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:"\${PGMODELER_ROOT}"
 
-	"/usr/bin/${PN}" "\$@" &
+	"/usr/bin/${PN}-bin" "\$@" &
 	EOF
 
-	dobin "${S}/start-pgmodeler.sh"
+	dobin "${S}/${PN}"
 
 	insinto "/usr/share/${PN}"
 	doins -r "${S}/conf"
