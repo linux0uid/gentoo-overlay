@@ -46,8 +46,14 @@ src_prepare() {
 	sed -i "s|${old_path}|${S}|g" pgmodeler.pri \
 		|| die 'failed to change work directory in pgmodeler.pri'
 
+	# Rename main file.
 	sed -i -e 's/TARGET = pgmodeler/TARGET = pgmodeler-bin/' main/main.pro \
 			|| die 'failed to rename binary'
+	# Change start script pgmodeler for graphical interface.
+	sed -i -e 's/STARTUP_SCRIPT="start-pgmodeler.sh"/STARTUP_SCRIPT="pgmodeler"/' linuxdeploy.sh \
+			|| die 'failed to rename binary'
+	sed -i -e 's/start-pgmodeler.sh/pgmodeler/' installer/linux/packages/br.com.pgmodeler/meta/installscript.qs \
+		    || die 'failed to rename binary'
 
 	# Enable the plugins building
 	if use plugins; then
@@ -138,6 +144,10 @@ src_install() {
 			doins "${S}/lang/${lingua}.ts"
 		fi
 	done
+
+	# icons
+	doicon "${S}/conf/pgmodeler_logo.png"
+	make_desktop_entry ${PN} PgModeler "${PN}_logo.png"
 }
 
 src_test() {
