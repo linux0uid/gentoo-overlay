@@ -14,7 +14,7 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-LINGUAS="en fr_FR pt_BR zh_CN"
+LINGUAS="en es_ES fr_FR pt_BR zh_CN"
 IUSE="test +plugins"
 
 for lingua in ${LINGUAS}; do
@@ -24,7 +24,7 @@ for lingua in ${LINGUAS}; do
 done
 
 RDEPEND="
-	=dev-db/postgresql-9.4*
+	>=dev-db/postgresql-9.4.5-r1:=
 	dev-libs/libxml2
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5
@@ -42,19 +42,9 @@ S="${WORKDIR}/${PN}-${PV/_/-}"
 
 src_prepare() {
 
-	old_path="/opt/pgmodeler"
-	sed -i "s|${old_path}|${S}|g" pgmodeler.pri \
-		|| die 'failed to change work directory in pgmodeler.pri'
-
 	# Rename main file.
 	sed -i -e 's/TARGET = pgmodeler/TARGET = pgmodeler-bin/' main/main.pro \
 			|| die 'failed to rename binary'
-
-	# Change start script pgmodeler for graphical interface.
-	sed -i -e 's/start-pgmodeler.sh/pgmodeler/' installer/linux/packages/br.com.pgmodeler/meta/installscript.qs \
-		&& sed -i -e 's/start-pgmodeler.sh/pgmodeler/' conf/schemas/desktop.sch \
-		&& sed -i -e 's/STARTUP_SCRIPT="start-pgmodeler.sh"/STARTUP_SCRIPT="pgmodeler"/' linuxdeploy.sh \
-		|| die 'failed to change name of the start script'
 
 	# Enable the plugins building
 	if use plugins; then
@@ -65,16 +55,22 @@ src_prepare() {
 }
 
 src_configure() {
-	local bindir="${D}usr/bin"
-	local libdir="${D}usr/$(get_libdir)"
-	local resdir="${D}usr/share/${PN}"
-	mkdir -p "${bindir}" "${libdir}" "${resdir}" || die
+	local prefix="${D}usr"
+	local bindir="${prefix}/bin"
+	local libdir="${prefix}/$(get_libdir)/${PN}"
+	local sharedir="${prefix}/share/${PN}"
+	local pluginsdir="${sharedir}/plugins"
+	mkdir -p "${bindir}" "${libdir}" "${sharedir}" "${pluginsdir}" || die
 	local pc="/usr/$(get_libdir)/postgresql/pkgconfig/"
 
 	# The PKG_CONFIG_PATH thing is probably a bug in
 	# dev-db/postgresql-base. See bug #512236.
 	PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${pc}" eqmake5 "${PN}.pro" \
-		BINDIR+="${bindir}" LIBDIR+="${libdir}" RESDIR+="${resdir}" PRIVATELIBDIR+="${libdir}"
+		PREFIX="${prefix}" \
+		PRIVATEBINDIR+="${bindir}" \
+		PRIVATELIBDIR+="${libdir}" \
+		SHAREDIR+="${sharedir}" \
+		PLUGINSDIR+="${pluginsdir}"
 }
 
 src_compile() {
@@ -83,6 +79,8 @@ src_compile() {
 }
 
 src_install() {
+	local libdir="/usr/$(get_libdir)/${PN}"
+
 	default
 
 	# Install our shell script wrapper.
@@ -112,15 +110,14 @@ src_install() {
 		cp --no-clobber -a "\${PGMODELER_ROOT}/conf" "\${USERDIR}/"
 	fi
 
-	export PGMODELER_CONF_DIR="\${USERDIR}/conf"
+	export PGMODELER_TMPL_CONF_DIR="\${USERDIR}/conf"
 	export PGMODELER_SCHEMAS_DIR="\${PGMODELER_ROOT}/schemas"
 	export PGMODELER_LANG_DIR="\${PGMODELER_ROOT}/lang"
-	export PGMODELER_TMP_DIR="${ROOT}tmp"
 	export PGMODELER_PLUGINS_DIR="\${PGMODELER_ROOT}/plugins"
 	export PGMODELER_SAMPLES_DIR="\$PGMODELER_ROOT/samples"
 	export PGMODELER_CHANDLER_PATH="${ROOT}usr/bin/pgmodeler-ch"
 	export PGMODELER_CLI_PATH="${ROOT}usr/bin/pgmodeler-cli"
-	export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:"\${PGMODELER_ROOT}"
+	export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:"${libdir}"
 
 	"/usr/bin/${PN}-bin" "\$@" &
 	EOF
@@ -134,10 +131,13 @@ src_install() {
 
 	# Plugins
 	if use plugins; then
-		doins -r "${S}/plugins"
+		insinto "/usr/share/${PN}/plugins"
+		for plugin in "${S}"/plugins/*/; do
+			doins -r "${plugin}"
+		done
 	fi
 
-	# LINGUAS
+	# Linguas
 	insinto "/usr/share/${PN}/lang"
 	for lingua in ${LINGUAS}; do
 		if [[ ${lingua} != "en" ]] && use linguas_${lingua}; then
@@ -146,7 +146,7 @@ src_install() {
 		fi
 	done
 
-	# icons
+	# Icons
 	doicon "${S}/conf/pgmodeler_logo.png"
 	make_desktop_entry ${PN} PgModeler "${PN}_logo.png"
 }
